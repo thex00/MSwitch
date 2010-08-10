@@ -35,4 +35,36 @@ module MStorage
 
 end
 
+module MTwirl
+  require 'socket'
+
+  class Router
+    def initialize
+      @daemon = TCPServer.new('127.0.0.1', 6005)  
+    end
+
+    def start
+        loop do  
+          Thread.start(@daemon.accept) do |s|  
+            print(s, " is connected\n")  
+            s.write("OK\n")
+            client_socketfamily, client_port, *client_addr = s.getpeername.unpack('nnC4')
+            source = client_addr.join('.')
+              print("from: #{source}\n")
+              s.gets
+              s.write($_)
+              print($_)
+            print(s, "is closed\n")  
+            s.close  
+            end
+          end
+    end
+
+    def stop
+      @daemon.close
+    end
+      
+  end
+end
+
 
